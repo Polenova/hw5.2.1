@@ -21,7 +21,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText editPassword;
     private Button buttonOK;
     private Button buttonRegistration;
-    private String fileInfo = "File_Login_Password";
+    private String fileLogin = "File_Login";
+    private String filePassword = "File_Password";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,27 +46,24 @@ public class MainActivity extends AppCompatActivity {
     private void getInfoFromFile() {
         String loginFromFile = null;
         String passwordFromFile = null;
-        BufferedReader bufferedReader = null;
+        BufferedReader bufferedReaderLogin = null;
+        BufferedReader bufferedReaderPassword = null;
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(openFileInput(fileInfo)));
-            String[] stringInfo = bufferedReader.readLine().split(";");
-            loginFromFile = stringInfo[0].toString();
-            passwordFromFile = stringInfo[1].toString();
+            bufferedReaderLogin = new BufferedReader(new InputStreamReader(openFileInput(fileLogin)));
+            loginFromFile = bufferedReaderLogin.readLine().toString();
+            bufferedReaderLogin.close();
+            bufferedReaderPassword = new BufferedReader(new InputStreamReader(openFileInput(filePassword)));
+            passwordFromFile = bufferedReaderPassword.readLine().toString();
+            bufferedReaderPassword.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (loginFromFile.equals(editLogin.getText().toString()) && passwordFromFile.equals(editPassword.getText().toString())) {
-                Toast.makeText(this, R.string.ok_info, Toast.LENGTH_SHORT).show();
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else if (bufferedReader == null) {
-                Toast.makeText(this, R.string.empty_info, Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, R.string.error_info, Toast.LENGTH_SHORT).show();
-            }
+        }
+        if (bufferedReaderLogin == null && bufferedReaderPassword == null) {
+            Toast.makeText(this, R.string.empty_info, Toast.LENGTH_SHORT).show();
+        } else if (loginFromFile.equals(editLogin.getText().toString()) && passwordFromFile.equals(editPassword.getText().toString())) {
+            Toast.makeText(this, R.string.ok_info, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, R.string.error_info, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -79,22 +77,24 @@ public class MainActivity extends AppCompatActivity {
         } else {
             BufferedWriter bufferedWriter = null;
             try {
-                FileOutputStream fileOutputStreamLogin = openFileOutput(fileInfo, MODE_PRIVATE);
+                FileOutputStream fileOutputStreamLogin = openFileOutput(fileLogin, MODE_PRIVATE);
                 OutputStreamWriter outputStreamWriterLogin = new OutputStreamWriter(fileOutputStreamLogin);
                 bufferedWriter = new BufferedWriter(outputStreamWriterLogin);
-                bufferedWriter.write(stringLogin + ";" + stringPassword + ";");
+                bufferedWriter.write(stringLogin);
+                bufferedWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                if (bufferedWriter != null) {
-                    try {
-                        bufferedWriter.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Toast.makeText(this, R.string.saved_info, Toast.LENGTH_SHORT).show();
-                }
             }
+            try {
+                FileOutputStream fileOutputStreamLogin = openFileOutput(filePassword, MODE_PRIVATE);
+                OutputStreamWriter outputStreamWriterLogin = new OutputStreamWriter(fileOutputStreamLogin);
+                bufferedWriter = new BufferedWriter(outputStreamWriterLogin);
+                bufferedWriter.write(stringPassword);
+                bufferedWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(this, R.string.saved_info, Toast.LENGTH_SHORT).show();
         }
     }
 
